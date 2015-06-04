@@ -1,9 +1,20 @@
 package br.ufg.inf.semaforo.agent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.TickerBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import br.ufg.inf.semaforo.constant.EnumCorSemaforo;
+import br.ufg.inf.semaforo.constant.EnumTrackDirection;
+import br.ufg.inf.semaforo.environment.Car;
+import br.ufg.inf.semaforo.environment.Street;
+import br.ufg.inf.semaforo.util.UtilRandom;
 
 public class SemaforoAgent extends Agent {
 
@@ -11,30 +22,142 @@ public class SemaforoAgent extends Agent {
 	 * 
 	 */
 	private static final long serialVersionUID = 2119467267589466071L;
-	
+
 	public static Integer COUNT_SEMAFOROS = 0;
 	
-	@SuppressWarnings("serial")
+	public static String TYPE_AGENT = "semaforo-agent";
+	
+	public static String AGENT_NAME = "semaforo";
+	
+	/**
+	 * Quantidade minima de carros
+	 */
+	private static final Integer INIT_COUNT_CAR = 3;
+	
+	/**
+	 * Quantidade maxima de carros por periodo
+	 */
+	private static final Integer BOUND_COUNT_CAR = 10;
+	
+	private AID[] sellerAgents;
+	
+	//Escopo com um semaforo por rua
+	private Street street;
+	
+	private EnumCorSemaforo corSemaforo;
+
 	@Override
+	@SuppressWarnings("serial")
 	protected void setup() {
-		System.out.println("Olá! Eu sou um agente Semáforo, meu id é: " + getAID().getName());
-		getAID().setLocalName("Semaforo-" + COUNT_SEMAFOROS++);
+		System.out.println("Agente criado!");
+		System.out.println("Olá! Eu sou um agente Semáforo, meu id é: "+ getAID().getName());
 		
-		addBehaviour(new CyclicBehaviour() {
+		createStreet();
+		registerInYellowPages();
+		
+		//Comportamento de procurar todos os agentes
+		addBehaviour(new TickerBehaviour(this, 5000) {
 			
 			@Override
-			public void action() {
-				MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
-				ACLMessage message = myAgent.receive(mt);
+			protected void onTick() {
+				// Atualiza a lista de agentes do tipo TYPE_AGENT
+				DFAgentDescription template = new DFAgentDescription();
+				ServiceDescription sd = new ServiceDescription();
+				sd.setType(TYPE_AGENT);
+				template.addServices(sd);
 				
-				if (message != null) {
-					// ...
+				try {
+					DFAgentDescription[] result = DFService.search(myAgent, template);
+					sellerAgents = new AID[result.length];
+					for (int i = 0; i < result.length; ++i) {
+						sellerAgents[i] = result[i].getName();
+					}
+				}
+				catch (FIPAException fe) {
+					fe.printStackTrace();
+				}
+			}
+		});
+		
+		//Comportamento de receber mensagem dos agentes
+		addBehaviour(new CyclicBehaviour() {
+			@Override
+			public void action() {
+				MessageTemplate mtInform = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+				ACLMessage messageInform = myAgent.receive(mtInform);
+				
+				MessageTemplate mTemplateCFP = MessageTemplate.MatchPerformative(ACLMessage.CFP);
+				ACLMessage messageCFP = myAgent.receive(mTemplateCFP);
+
+				if (messageInform != null) {
+					String content = messageInform.getContent();
+					String quantidadeDeCarrosStr = content.substring(content.indexOf("Carros:"), content.length());
+					
+					Integer quantidadeDeCarros = Integer.parseInt(quantidadeDeCarrosStr);
+					
+					//TODO Problema, TODOS vão receber os valores e calcular qual irá liberar, ou devera ter mais um agente para escolher isso?
+					messageInform.getSender();
+					
+				} else if (messageCFP != null) {
+					
 				} else {
-					//TODO Testar sem o block();
+					// TODO Testar sem o block();
 					block();
+				}
+			}
+		});
+		
+		//Comportamento de perceber a quantidade de carros no ambiente do agente(rua), 
+		//e mandar a mensagem com a quantidade de carros em seu ambiente
+		addBehaviour(new TickerBehaviour(this, 5000) {
+			
+			@Override
+			protected void onTick() {
+				int quantidadeDeCarros = UtilRandom.generateRandom(INIT_COUNT_CAR, BOUND_COUNT_CAR);
+				
+				for (int i = 0; i < quantidadeDeCarros; i++) {
+					street.addCar(new Car());
+				}
+				
+				for (AID aid : sellerAgents) {
+					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+					msg.setContent("Carros:" + street.getCars().size());
+					msg.addReceiver(aid);
+					send(msg);
 				}
 			}
 		});
 	}
 
+	@Override
+	protected void takeDown() {
+		try {
+			DFService.deregister(this);
+		} catch (FIPAException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("Agente terminado!");
+	}
+	
+	private void createStreet() {
+		street = new Street(2, EnumTrackDirection.SENTIDO_DUPLO);
+	}
+
+	private void registerInYellowPages() {
+		DFAgentDescription dfd = new DFAgentDescription();
+		dfd.setName(getAID());
+		
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(TYPE_AGENT);
+		sd.setName(AGENT_NAME + "-" + COUNT_SEMAFOROS++);
+		
+		dfd.addServices(sd);
+		
+		try {
+			DFService.register(this, dfd);
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+	}
 }

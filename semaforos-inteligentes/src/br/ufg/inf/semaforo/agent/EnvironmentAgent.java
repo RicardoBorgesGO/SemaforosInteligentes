@@ -66,6 +66,12 @@ public class EnvironmentAgent extends Agent {
 			}
 		});
 	}
+	
+	@Override
+	protected void takeDown() {
+		// TODO Auto-generated method stub
+		super.takeDown();
+	}
 
 	public List<Street> getStreets() {
 		return streets;
