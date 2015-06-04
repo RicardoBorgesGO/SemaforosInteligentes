@@ -5,6 +5,21 @@ public class Car {
 	private Double tamanho;
 	private Double velocidadeMedia;
 
+	/**
+	 * 
+	 */
+	public Car() {
+	}
+
+	/**
+	 * @param tamanho
+	 * @param velocidadeMedia
+	 */
+	public Car(Double tamanho, Double velocidadeMedia) {
+		this.tamanho = tamanho;
+		this.velocidadeMedia = velocidadeMedia;
+	}
+
 	public Double getTamanho() {
 		return tamanho;
 	}

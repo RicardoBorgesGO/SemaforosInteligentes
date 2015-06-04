@@ -11,6 +11,21 @@ public class Street {
 	private EnumTrackDirection direction;
 	private List<Car> cars;
 
+	/**
+	 * 
+	 */
+	public Street() {
+	}
+
+	/**
+	 * @param quantidadeDeVias
+	 * @param direction
+	 */
+	public Street(Integer quantidadeDeVias, EnumTrackDirection direction) {
+		this.quantidadeDeVias = quantidadeDeVias;
+		this.direction = direction;
+	}
+
 	public Integer getQuantidadeDeVias() {
 		return quantidadeDeVias;
 	}
@@ -35,6 +50,14 @@ public class Street {
 
 	public void setCars(List<Car> cars) {
 		this.cars = cars;
+	}
+	
+	/**
+	 * Adiciona carros na lista de carros de uma rua
+	 * @param car
+	 */
+	public void addCar(Car car) {
+		getCars().add(car);
 	}
 
 }
