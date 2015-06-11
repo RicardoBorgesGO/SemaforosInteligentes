@@ -10,10 +10,12 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import br.ufg.inf.semaforo.constant.EnumCorSemaforo;
+import br.ufg.inf.semaforo.constant.EnumEstadoSemaforo;
 import br.ufg.inf.semaforo.constant.EnumTrackDirection;
 import br.ufg.inf.semaforo.environment.Car;
 import br.ufg.inf.semaforo.environment.Street;
+import br.ufg.inf.semaforo.util.UtilAgent;
+import br.ufg.inf.semaforo.util.UtilMessage;
 import br.ufg.inf.semaforo.util.UtilRandom;
 
 public class SemaforoAgent extends Agent {
@@ -41,11 +43,16 @@ public class SemaforoAgent extends Agent {
 	
 	private AID[] sellerAgents;
 	
+	private AID sellerControlador;
+	
 	//Escopo com um semaforo por rua
 	private Street street;
 	
-	private EnumCorSemaforo corSemaforo;
-
+	private EnumEstadoSemaforo estadoSemaforo;
+	
+	/**
+	 * Metodo chamado ao criar o agente
+	 */
 	@Override
 	@SuppressWarnings("serial")
 	protected void setup() {
@@ -55,6 +62,14 @@ public class SemaforoAgent extends Agent {
 		createStreet();
 		registerInYellowPages();
 		
+		/**
+		 * Tipos de behavior
+		 * Waker - relacionado a acordar.
+		 * Ticker - acontece de tempo em tempo, intervalo de tempo.
+		 * Cyclic - relacionado 
+		 */
+		
+		//TODO Substituir pela classe do comportamento criada
 		//Comportamento de procurar todos os agentes
 		addBehaviour(new TickerBehaviour(this, 5000) {
 			
@@ -63,10 +78,12 @@ public class SemaforoAgent extends Agent {
 				// Atualiza a lista de agentes do tipo TYPE_AGENT
 				DFAgentDescription template = new DFAgentDescription();
 				ServiceDescription sd = new ServiceDescription();
-				sd.setType(TYPE_AGENT);
+//				sd.setType(ControladorAgent.TYPE_AGENT);
+				sd.setName(ControladorAgent.AGENT_NAME);
 				template.addServices(sd);
 				
 				try {
+					//TODO Restringir em apenas 1 agente controlador
 					DFAgentDescription[] result = DFService.search(myAgent, template);
 					sellerAgents = new AID[result.length];
 					for (int i = 0; i < result.length; ++i) {
@@ -79,37 +96,9 @@ public class SemaforoAgent extends Agent {
 			}
 		});
 		
-		//Comportamento de receber mensagem dos agentes
-		addBehaviour(new CyclicBehaviour() {
-			@Override
-			public void action() {
-				MessageTemplate mtInform = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-				ACLMessage messageInform = myAgent.receive(mtInform);
-				
-				MessageTemplate mTemplateCFP = MessageTemplate.MatchPerformative(ACLMessage.CFP);
-				ACLMessage messageCFP = myAgent.receive(mTemplateCFP);
-
-				if (messageInform != null) {
-					String content = messageInform.getContent();
-					String quantidadeDeCarrosStr = content.substring(content.indexOf("Carros:"), content.length());
-					
-					Integer quantidadeDeCarros = Integer.parseInt(quantidadeDeCarrosStr);
-					
-					//TODO Problema, TODOS vão receber os valores e calcular qual irá liberar, ou devera ter mais um agente para escolher isso?
-					messageInform.getSender();
-					
-				} else if (messageCFP != null) {
-					
-				} else {
-					// TODO Testar sem o block();
-					block();
-				}
-			}
-		});
-		
 		//Comportamento de perceber a quantidade de carros no ambiente do agente(rua), 
 		//e mandar a mensagem com a quantidade de carros em seu ambiente
-		addBehaviour(new TickerBehaviour(this, 5000) {
+		addBehaviour(new TickerBehaviour(this, 10000) {
 			
 			@Override
 			protected void onTick() {
@@ -120,15 +109,15 @@ public class SemaforoAgent extends Agent {
 				}
 				
 				for (AID aid : sellerAgents) {
-					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-					msg.setContent("Carros:" + street.getCars().size());
-					msg.addReceiver(aid);
-					send(msg);
+					UtilMessage.sendInformMessage("Carros:" + street.getCars().size(), aid, getCurrentAgent());
 				}
 			}
 		});
 	}
 
+	/**
+	 * Metodo para finalizar o agente
+	 */
 	@Override
 	protected void takeDown() {
 		try {
@@ -140,24 +129,21 @@ public class SemaforoAgent extends Agent {
 		System.out.println("Agente terminado!");
 	}
 	
+	/**
+	 * Inicializa as ruas do ambiente 
+	 */
 	private void createStreet() {
 		street = new Street(2, EnumTrackDirection.SENTIDO_DUPLO);
 	}
 
+	/**
+	 * Registra os agentas nas paginas amarelas (DFAgent)
+	 */
 	private void registerInYellowPages() {
-		DFAgentDescription dfd = new DFAgentDescription();
-		dfd.setName(getAID());
-		
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType(TYPE_AGENT);
-		sd.setName(AGENT_NAME + "-" + COUNT_SEMAFOROS++);
-		
-		dfd.addServices(sd);
-		
-		try {
-			DFService.register(this, dfd);
-		} catch (FIPAException fe) {
-			fe.printStackTrace();
-		}
+		UtilAgent.registerInYellowPages(getAID(), this, TYPE_AGENT, AGENT_NAME + "-" + COUNT_SEMAFOROS++);
+	}
+	
+	public Agent getCurrentAgent() {
+		return this;
 	}
 }
