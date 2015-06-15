@@ -23,6 +23,8 @@ public class ControladorAgent extends Agent {
 	
 	public static String AGENT_NAME = "controlador1";
 	
+	private static Integer COUNT_SENDERS = 0;
+	
 //	private List<AID> sendersAgent;
 	
 	private List<SemaforoVO> semaforos;
@@ -46,13 +48,25 @@ public class ControladorAgent extends Agent {
 
 				if (messageInform != null) {
 					String content = messageInform.getContent();
-					String quantidadeDeCarrosStr = content.substring(content.indexOf(":")+1, content.length());
+					Integer delimiter = content.indexOf(":");
+					
+					String quantidadeDeCarrosStr = content.substring(0, delimiter);
+					String quantidadeDeSemaforosStr = content.substring(delimiter+1, content.length());
 					
 					Integer quantidadeDeCarros = Integer.parseInt(quantidadeDeCarrosStr);
+					Integer quantidadeDeSemaforos = Integer.parseInt(quantidadeDeSemaforosStr);
 					
 					addSendersAgent(new SemaforoVO(messageInform.getSender(), quantidadeDeCarros));
-				} else if (messageCFP != null) {
 					
+					COUNT_SENDERS++;
+					
+					if (quantidadeDeSemaforos.equals(COUNT_SENDERS)) {
+						//TODO executar metodo quando todos enviarem a mensagem
+						
+						COUNT_SENDERS = 0;
+					}
+				} else if (messageCFP != null) {
+					//TODO verificar a necessidade desta condicao
 				} else {
 					// TODO Testar sem o block();
 					block();

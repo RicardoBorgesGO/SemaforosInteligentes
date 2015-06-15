@@ -2,14 +2,11 @@ package br.ufg.inf.semaforo.agent;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import br.ufg.inf.semaforo.constant.EnumEstadoSemaforo;
 import br.ufg.inf.semaforo.constant.EnumTrackDirection;
 import br.ufg.inf.semaforo.environment.Car;
@@ -59,6 +56,8 @@ public class SemaforoAgent extends Agent {
 		System.out.println("Agente criado!");
 		System.out.println("Olá! Eu sou um agente Semáforo, meu id é: "+ getAID().getName());
 		
+		COUNT_SEMAFOROS++;
+		
 		createStreet();
 		registerInYellowPages();
 		
@@ -89,8 +88,7 @@ public class SemaforoAgent extends Agent {
 					for (int i = 0; i < result.length; ++i) {
 						sellerAgents[i] = result[i].getName();
 					}
-				}
-				catch (FIPAException fe) {
+				} catch (FIPAException fe) {
 					fe.printStackTrace();
 				}
 			}
@@ -109,7 +107,8 @@ public class SemaforoAgent extends Agent {
 				}
 				
 				for (AID aid : sellerAgents) {
-					UtilMessage.sendInformMessage("Carros:" + street.getCars().size(), aid, getCurrentAgent());
+					//Numero de carros e quantidade de semaforos
+					UtilMessage.sendInformMessage(street.getCars().size() + ":" + COUNT_SEMAFOROS, aid, getCurrentAgent());
 				}
 			}
 		});
