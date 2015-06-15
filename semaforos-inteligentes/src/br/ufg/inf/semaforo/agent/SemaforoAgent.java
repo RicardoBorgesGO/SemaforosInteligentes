@@ -54,9 +54,7 @@ public class SemaforoAgent extends Agent {
 	@SuppressWarnings("serial")
 	protected void setup() {
 		System.out.println("Agente criado!");
-		System.out.println("Olá! Eu sou um agente Semáforo, meu id é: "+ getAID().getName());
-		
-		COUNT_SEMAFOROS++;
+		System.out.println("Olï¿½! Eu sou um agente Semï¿½foro, meu id ï¿½: "+ getAID().getName());
 		
 		createStreet();
 		registerInYellowPages();
@@ -110,6 +108,7 @@ public class SemaforoAgent extends Agent {
 					//Numero de carros e quantidade de semaforos
 					UtilMessage.sendInformMessage(street.getCars().size() + ":" + COUNT_SEMAFOROS, aid, getCurrentAgent());
 				}
+				street.getCars().clear();
 			}
 		});
 	}

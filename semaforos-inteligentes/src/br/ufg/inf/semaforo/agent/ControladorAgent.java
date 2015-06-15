@@ -1,16 +1,16 @@
 package br.ufg.inf.semaforo.agent;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import br.ufg.inf.semaforo.util.UtilAgent;
-import br.ufg.inf.semaforo.vo.SemaforoVO;
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import br.ufg.inf.semaforo.util.UtilAgent;
+import br.ufg.inf.semaforo.vo.SemaforoVO;
 
 public class ControladorAgent extends Agent {
 
@@ -32,7 +32,7 @@ public class ControladorAgent extends Agent {
 	@Override
 	protected void setup() {
 		System.out.println("Agente criado!");
-		System.out.println("Olá! Eu sou um agente Controlador, meu id é: "+ getAID().getName());
+		System.out.println("Olï¿½! Eu sou um agente Controlador, meu id ï¿½: "+ getAID().getName());
 		
 		registerInYellowPages();
 		
@@ -56,12 +56,17 @@ public class ControladorAgent extends Agent {
 					Integer quantidadeDeCarros = Integer.parseInt(quantidadeDeCarrosStr);
 					Integer quantidadeDeSemaforos = Integer.parseInt(quantidadeDeSemaforosStr);
 					
+					//TODO Verificar se recebeu de todos os carros e nao a quantidade de mensagem ser a mesma dos carros
 					addSendersAgent(new SemaforoVO(messageInform.getSender(), quantidadeDeCarros));
 					
 					COUNT_SENDERS++;
 					
+					System.out.println("Quantidade de carros: " + quantidadeDeCarros);
+					System.out.println("Quantidade de carros: " + quantidadeDeSemaforos);
+					
 					if (quantidadeDeSemaforos.equals(COUNT_SENDERS)) {
 						//TODO executar metodo quando todos enviarem a mensagem
+						System.out.println("Opa! Recebeu todos.");
 						
 						COUNT_SENDERS = 0;
 					}
