@@ -12,7 +12,7 @@ import java.util.List;
 import br.ufg.inf.semaforo.util.UtilAgent;
 import br.ufg.inf.semaforo.vo.SemaforoVO;
 
-public class ControladorAgent extends Agent {
+public class SensorAgent extends Agent {
 
 	/**
 	 * 

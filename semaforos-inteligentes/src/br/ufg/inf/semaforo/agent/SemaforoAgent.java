@@ -76,7 +76,7 @@ public class SemaforoAgent extends Agent {
 				DFAgentDescription template = new DFAgentDescription();
 				ServiceDescription sd = new ServiceDescription();
 //				sd.setType(ControladorAgent.TYPE_AGENT);
-				sd.setName(ControladorAgent.AGENT_NAME);
+				sd.setName(SensorAgent.AGENT_NAME);
 				template.addServices(sd);
 				
 				try {

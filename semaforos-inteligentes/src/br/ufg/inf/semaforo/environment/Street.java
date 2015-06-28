@@ -9,6 +9,7 @@ public class Street {
 
 	private Integer quantidadeDeVias;
 	private EnumTrackDirection direction;
+	private Double tamanhoEmKilometros;
 	private List<Car> cars;
 
 	/**
@@ -24,6 +25,18 @@ public class Street {
 	public Street(Integer quantidadeDeVias, EnumTrackDirection direction) {
 		this.quantidadeDeVias = quantidadeDeVias;
 		this.direction = direction;
+	}
+
+	/**
+	 * @param quantidadeDeVias
+	 * @param direction
+	 * @param tamanhoEmKilometros
+	 */
+	public Street(Integer quantidadeDeVias, EnumTrackDirection direction,
+			Double tamanhoEmKilometros) {
+		this.quantidadeDeVias = quantidadeDeVias;
+		this.direction = direction;
+		this.tamanhoEmKilometros = tamanhoEmKilometros;
 	}
 
 	public Integer getQuantidadeDeVias() {
@@ -51,9 +64,18 @@ public class Street {
 	public void setCars(List<Car> cars) {
 		this.cars = cars;
 	}
-	
+
+	public Double getTamanhoEmKilometros() {
+		return tamanhoEmKilometros;
+	}
+
+	public void setTamanhoEmKilometros(Double tamanhoEmKilometros) {
+		this.tamanhoEmKilometros = tamanhoEmKilometros;
+	}
+
 	/**
 	 * Adiciona carros na lista de carros de uma rua
+	 * 
 	 * @param car
 	 */
 	public void addCar(Car car) {
