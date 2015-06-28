@@ -24,16 +24,6 @@ public class TrafficLightAgent extends Agent {
 	
 	private static String AGENT_NAME = "trafficLight";
 	
-	/**
-	 * Quantidade minima de carros
-	 */
-	private static final Integer INIT_COUNT_CAR = 3;
-	
-	/**
-	 * Quantidade maxima de carros por periodo
-	 */
-	private static final Integer BOUND_COUNT_CAR = 10;
-	
 	private static Integer COUNT_SEMAFOROS;
 	
 	@Override
@@ -49,11 +39,14 @@ public class TrafficLightAgent extends Agent {
 			
 			@Override
 			protected void onTick() {
-				int quantidadeDeCarros = UtilRandom.generateRandom(INIT_COUNT_CAR, BOUND_COUNT_CAR);
+				//Carros com seus respectivos tempos para chegarem ao semaforo
+				sensor.getCarTime();
 				
-				for (int i = 0; i < quantidadeDeCarros; i++) {
-					sensor.getStreet().addCar(new Car());
-				}
+//				int quantidadeDeCarros = UtilRandom.generateRandom(INIT_COUNT_CAR, BOUND_COUNT_CAR);
+//				
+//				for (int i = 0; i < quantidadeDeCarros; i++) {
+//					sensor.getStreet().addCar(new Car());
+//				}
 				
 //				for (AID aid : sellerAgents) {
 //					//Numero de carros e quantidade de semaforos
