@@ -11,4 +11,5 @@ public class UtilVelocidadeMedia {
 	public static Double calculaTempo(Double velocidadeMedia, Double distancia) {
 		return distancia/velocidadeMedia;
 	}
+	
 }

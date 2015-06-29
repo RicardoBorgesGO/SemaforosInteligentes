@@ -4,11 +4,19 @@ public class Car {
 
 	private Double tamanho;
 	private Double velocidadeMedia;
+	private Double distanciaDoSemaforo;
 
 	/**
 	 * 
 	 */
 	public Car() {
+	}
+
+	/**
+	 * @param velocidadeMedia
+	 */
+	public Car(Double velocidadeMedia) {
+		this.velocidadeMedia = velocidadeMedia;
 	}
 
 	/**
@@ -34,6 +42,14 @@ public class Car {
 
 	public void setVelocidadeMedia(Double velocidadeMedia) {
 		this.velocidadeMedia = velocidadeMedia;
+	}
+
+	public Double getDistanciaDoSemaforo() {
+		return distanciaDoSemaforo;
+	}
+
+	public void setDistanciaDoSemaforo(Double distanciaDoSemaforo) {
+		this.distanciaDoSemaforo = distanciaDoSemaforo;
 	}
 
 }
