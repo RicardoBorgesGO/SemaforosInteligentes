@@ -1,10 +1,13 @@
 package br.ufg.inf.semaforo.environment;
 
+import br.ufg.inf.semaforo.constant.EnumEstadoMovimentoCarro;
+
 public class Car {
 
 	private Double tamanho;
 	private Double velocidadeMedia;
 	private Double distanciaDoSemaforo;
+	private EnumEstadoMovimentoCarro estadoMovimentoCarro;
 
 	/**
 	 * 
@@ -20,12 +23,13 @@ public class Car {
 	}
 
 	/**
-	 * @param tamanho
+	 * @param distanciaDoSemaforo
 	 * @param velocidadeMedia
 	 */
-	public Car(Double tamanho, Double velocidadeMedia) {
-		this.tamanho = tamanho;
+	public Car(Double distanciaDoSemaforo, Double velocidadeMedia, EnumEstadoMovimentoCarro estadoMovimentoCarro) {
+		this.distanciaDoSemaforo = distanciaDoSemaforo;
 		this.velocidadeMedia = velocidadeMedia;
+		this.estadoMovimentoCarro = estadoMovimentoCarro;
 	}
 
 	public Double getTamanho() {
@@ -50,6 +54,14 @@ public class Car {
 
 	public void setDistanciaDoSemaforo(Double distanciaDoSemaforo) {
 		this.distanciaDoSemaforo = distanciaDoSemaforo;
+	}
+
+	public EnumEstadoMovimentoCarro getEstadoMovimentoCarro() {
+		return estadoMovimentoCarro;
+	}
+
+	public void setEstadoMovimentoCarro(EnumEstadoMovimentoCarro estadoMovimentoCarro) {
+		this.estadoMovimentoCarro = estadoMovimentoCarro;
 	}
 
 }

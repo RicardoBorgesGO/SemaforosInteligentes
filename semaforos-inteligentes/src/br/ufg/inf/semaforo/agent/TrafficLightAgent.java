@@ -53,44 +53,34 @@ public class TrafficLightAgent extends Agent {
 			@Override
 			protected void onTick() {
 				sensor.start();
-//				System.out.println("Tamanho do Map: " + carTime.size());
-				
-				/**
-				 * Temporizador em segundos
-				 */
-//				new Timer().schedule(new TimerTask() {
-//					
-//					@Override
-//					public void run() {
-//						
-//						for (Car car : carTime.keySet()) {
-//							Double time = carTime.get(car);
-//							time--;
-//							
-//							if (time >= 0)
-//								carTime.put(car, time);
-//							
-//						}
-//					}
-//					
-//				}, 0, 1000);
 			}
 		});
 		
+		addBehaviour(new TickerBehaviour(this, 1000) {
+			
+			@Override
+			protected void onTick() {
+				for (Car car : sensor.getStreet().getCars()) {
+					System.out.println("Carro" + car.getDistanciaDoSemaforo() +" - Estado do movimento do carro: " + car.getEstadoMovimentoCarro());
+				}
+			}
+		});
 	}
 	
-	private Set<Car> countToReleaseCars(Map<Car, Double> cars) {
-		Set<Car> carrosParaLiberar = new LinkedHashSet<Car>();
-		
-		for (Car car : cars.keySet()) {
-			Double time = cars.get(car);
-			
-			if (time < 2)
-				carrosParaLiberar.add(car);
-		}
-		
-		return carrosParaLiberar;
-	}
+	
+	
+//	private Set<Car> countToReleaseCars(Map<Car, Double> cars) {
+//		Set<Car> carrosParaLiberar = new LinkedHashSet<Car>();
+//		
+//		for (Car car : cars.keySet()) {
+//			Double time = cars.get(car);
+//			
+//			if (time < 2)
+//				carrosParaLiberar.add(car);
+//		}
+//		
+//		return carrosParaLiberar;
+//	}
 	
 	private void liberarSemaforo() {
 		estadoSemaforo = EnumEstadoSemaforo.VERDE;
