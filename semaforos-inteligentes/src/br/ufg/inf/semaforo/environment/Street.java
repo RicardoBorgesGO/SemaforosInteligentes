@@ -1,16 +1,36 @@
 package br.ufg.inf.semaforo.environment;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javax.swing.text.StyledEditorKit.ItalicAction;
+
+import br.ufg.inf.semaforo.agent.TrafficLightAgent;
+import br.ufg.inf.semaforo.constant.EnumEstadoMovimentoCarro;
+import br.ufg.inf.semaforo.constant.EnumEstadoSemaforo;
 import br.ufg.inf.semaforo.constant.EnumTrackDirection;
+import br.ufg.inf.semaforo.util.UtilRandom;
 
 public class Street {
 
 	private Integer quantidadeDeVias;
 	private EnumTrackDirection direction;
-	private Double tamanhoEmKilometros;
+	private Double tamanhoDaVia;
+	private Double tamanhoReservadoPorCarro;
 	private List<Car> cars;
+	
+	/**
+	 * Quantidade minima de carros
+	 */
+	private static final Integer INIT_COUNT_CAR = 1;
+
+	/**
+	 * Quantidade maxima de carros por periodo
+	 */
+	private static final Integer BOUND_COUNT_CAR = 3;
 
 	/**
 	 * 
@@ -30,13 +50,14 @@ public class Street {
 	/**
 	 * @param quantidadeDeVias
 	 * @param direction
-	 * @param tamanhoEmKilometros
+	 * @param tamanhoDaVia
 	 */
 	public Street(Integer quantidadeDeVias, EnumTrackDirection direction,
-			Double tamanhoEmKilometros) {
+			Double tamanhoDaVia, Double tamanhoBlocoDoCarro) {
 		this.quantidadeDeVias = quantidadeDeVias;
 		this.direction = direction;
-		this.tamanhoEmKilometros = tamanhoEmKilometros;
+		this.tamanhoDaVia = tamanhoDaVia;
+		this.tamanhoReservadoPorCarro = tamanhoBlocoDoCarro;
 	}
 
 	public Integer getQuantidadeDeVias() {
@@ -65,12 +86,66 @@ public class Street {
 		this.cars = cars;
 	}
 
-	public Double getTamanhoEmKilometros() {
-		return tamanhoEmKilometros;
+	/**
+	 * Tamanho da via em metros
+	 * 
+	 * @return
+	 */
+	public Double getTamanhoDaVia() {
+		return tamanhoDaVia;
 	}
 
-	public void setTamanhoEmKilometros(Double tamanhoEmKilometros) {
-		this.tamanhoEmKilometros = tamanhoEmKilometros;
+	public void setTamanhoDaVia(Double tamanhoDaVia) {
+		this.tamanhoDaVia = tamanhoDaVia;
+	}
+
+	public Double getTamanhoReservadoPorCarro() {
+		return tamanhoReservadoPorCarro;
+	}
+
+	public void setTamanhoReservadoPorCarro(Double tamanhoBlocoDoCarro) {
+		this.tamanhoReservadoPorCarro = tamanhoBlocoDoCarro;
+	}
+	
+	public void start() {
+		new Timer().schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				if (TrafficLightAgent.ESTADO_SEMAFORO.equals(EnumEstadoSemaforo.VERDE)) {
+					try {
+						for (Car car : cars) {
+							if (car.getDistanciaDoSemaforo() < tamanhoReservadoPorCarro) {
+								removeCar(car);
+							}
+							
+							runCar(car);
+						}
+					} catch (Exception e) {
+						
+					}
+				}
+			}
+			
+		}, 0, 1000);
+	}
+	
+	public void cognizeCar() {
+		int quantidadeDeCarros = UtilRandom.generateRandom(INIT_COUNT_CAR, BOUND_COUNT_CAR);
+		
+		System.out.println("Chegaram mais " + quantidadeDeCarros + " carros\n");
+		
+		for (int i = 0; i < quantidadeDeCarros; i++) {
+			addCar(new Car(tamanhoDaVia, 10.0, EnumEstadoMovimentoCarro.EM_MOVIMENTO));
+		}
+	}
+	
+	/**
+	 * Fazer o carro andar
+	 * @param car
+	 */
+	public void runCar(Car car) {
+		car.setDistanciaDoSemaforo(car.getDistanciaDoSemaforo() - car.getVelocidadeMedia());
 	}
 
 	/**
@@ -80,6 +155,10 @@ public class Street {
 	 */
 	public void addCar(Car car) {
 		getCars().add(car);
+	}
+	
+	public void removeCar(Car car) {
+		getCars().remove(car);
 	}
 
 }
