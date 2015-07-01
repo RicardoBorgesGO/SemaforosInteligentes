@@ -8,6 +8,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
 import java.util.List;
 import java.util.Timer;
@@ -133,7 +134,12 @@ public class TrafficLightAgent extends Agent {
 				ACLMessage messageInform = myAgent.receive(mtInform);
 				
 				if (messageInform != null) {
-					
+					try {
+						Car car = (Car) messageInform.getContentObject();
+						sensor.getStreet().addCar(car);
+					} catch (UnreadableException e) {
+						e.printStackTrace();
+					}
 				} else {
 					block();
 				}
