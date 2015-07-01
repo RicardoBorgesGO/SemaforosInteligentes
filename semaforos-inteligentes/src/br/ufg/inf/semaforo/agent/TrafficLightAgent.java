@@ -23,7 +23,6 @@ import br.ufg.inf.semaforo.environment.Street;
 import br.ufg.inf.semaforo.util.UtilAgent;
 import br.ufg.inf.semaforo.util.UtilMath;
 import br.ufg.inf.semaforo.util.UtilMessage;
-import br.ufg.inf.semaforo.vo.SemaforoVO;
 
 public class TrafficLightAgent extends Agent {
 
@@ -38,7 +37,7 @@ public class TrafficLightAgent extends Agent {
 	
 	public static String TYPE_AGENT = "trafficLightAgent";
 	
-	private static String AGENT_NAME = "trafficLight";
+	private String agentName = "trafficLight";
 	
 	private static Integer COUNT_SEMAFOROS = 0;
 	
@@ -80,8 +79,11 @@ public class TrafficLightAgent extends Agent {
 			protected void onTick() {
 				List<Car> cars = sensor.getStreet().getCars();
 				
+				System.out.println("=========================");
+				System.out.println("AGENTE: " + agentName);
+				
 				for (Car car : cars) {
-					System.out.println("Carro" + car.getDistanciaDoSemaforo() +" - Estado do movimento do carro: " + car.getEstadoMovimentoCarro());
+					System.out.println("Distância do Carro ao semáforo: " + car.getDistanciaDoSemaforo() +" - Estado do movimento do carro: " + car.getEstadoMovimentoCarro());
 				}
 				
 				Integer countCarInVia = (int) ((sensor.getStreet().getTamanhoDaVia()/sensor.getStreet().getTamanhoReservadoPorCarro())*sensor.getStreet().getQuantidadeDeVias());
@@ -112,17 +114,23 @@ public class TrafficLightAgent extends Agent {
 			protected void onTick() {
 				AID aid = null;
 				
-				for (AID aidThis : sellerAgents) {
-					if (aidThis.getName().equals(searchNameNextAgent())) {
-						aid = aidThis;
-						break;
+				System.out.println("Proximo agente: " + searchNameNextAgent());
+				
+				if (sellerAgents != null) {
+					for (AID aidThis : sellerAgents) {
+						if (aidThis.getName().equals(searchNameNextAgent())) {
+							aid = aidThis;
+							break;
+						}
+					}
+					
+					if (aid != null) {
+						for (Car car : sensor.getStreet().getCarsExit()) {
+							System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ENVIOU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+							UtilMessage.sendObjectMessage(car, aid, getCurrentAgent(), new ACLMessage(ACLMessage.INFORM));
+						}
 					}
 				}
-				
-				for (Car car : sensor.getStreet().getCarsExit()) {
-					UtilMessage.sendObjectMessage(car, aid, getCurrentAgent(), new ACLMessage(ACLMessage.INFORM));
-				}
-				
 			}
 		});
 		
@@ -137,6 +145,7 @@ public class TrafficLightAgent extends Agent {
 					try {
 						Car car = (Car) messageInform.getContentObject();
 						sensor.getStreet().addCar(car);
+						System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!RECEBEU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 					} catch (UnreadableException e) {
 						e.printStackTrace();
 					}
@@ -153,14 +162,15 @@ public class TrafficLightAgent extends Agent {
 
 	private void createAgentName() {
 		numberTrafficLight = COUNT_SEMAFOROS;
-		AGENT_NAME = AGENT_NAME + "-" + COUNT_SEMAFOROS++;
+		agentName = agentName + "-" + COUNT_SEMAFOROS++;
 	}
 	
 	private String searchNameNextAgent() {
 		Integer num = numberTrafficLight;
-		numberTrafficLight++;
+		String nextAgentName = agentName.replace(num.toString(), "");
+		num++;
 		
-		return AGENT_NAME.concat(num.toString());
+		return nextAgentName.concat(num.toString());
 	}
 	
 	public static void main(String[] args) {
@@ -238,6 +248,6 @@ public class TrafficLightAgent extends Agent {
 	 * Registra os agentas nas paginas amarelas (DFAgent)
 	 */
 	private void registerInYellowPages() {
-		UtilAgent.registerInYellowPages(getAID(), this, TYPE_AGENT, AGENT_NAME);
+		UtilAgent.registerInYellowPages(getAID(), this, TYPE_AGENT, agentName);
 	}
 }
