@@ -18,15 +18,15 @@ public class UtilMessage {
 	
 	/**
 	 * Envia mensagem com objeto serializado com a performativa passado por parametro
-	 * @param content
+	 * @param object
 	 * @param receiver
 	 * @param agent
 	 * @param aclMessage
 	 */
-	public static <T extends Serializable> void sendObjectMessage(T content, AID receiver, Agent agent, ACLMessage aclMessage) {
+	public static <T extends Serializable> void sendObjectMessage(T object, AID receiver, Agent agent, ACLMessage aclMessage) {
 		try {
 			ACLMessage msg = new ACLMessage(aclMessage.getPerformative());
-			msg.setContentObject(content);
+			msg.setContentObject(object);
 			msg.addReceiver(receiver);
 			agent.send(msg);
 		} catch (IOException e) {

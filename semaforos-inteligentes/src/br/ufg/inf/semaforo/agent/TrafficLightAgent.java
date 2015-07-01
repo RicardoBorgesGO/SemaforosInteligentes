@@ -2,9 +2,12 @@ package br.ufg.inf.semaforo.agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 import java.util.List;
 import java.util.Timer;
@@ -18,6 +21,8 @@ import br.ufg.inf.semaforo.environment.Sensor;
 import br.ufg.inf.semaforo.environment.Street;
 import br.ufg.inf.semaforo.util.UtilAgent;
 import br.ufg.inf.semaforo.util.UtilMath;
+import br.ufg.inf.semaforo.util.UtilMessage;
+import br.ufg.inf.semaforo.vo.SemaforoVO;
 
 public class TrafficLightAgent extends Agent {
 
@@ -104,15 +109,40 @@ public class TrafficLightAgent extends Agent {
 			
 			@Override
 			protected void onTick() {
-				for (AID aid : sellerAgents) {
-					if (aid.getName().equals(searchNameNextAgent())) {
-						//TODO Enviar mensagem para o agente que encontrou
+				AID aid = null;
+				
+				for (AID aidThis : sellerAgents) {
+					if (aidThis.getName().equals(searchNameNextAgent())) {
+						aid = aidThis;
+						break;
 					}
 				}
 				
-				sensor.getStreet().getCarsExit();
+				for (Car car : sensor.getStreet().getCarsExit()) {
+					UtilMessage.sendObjectMessage(car, aid, getCurrentAgent(), new ACLMessage(ACLMessage.INFORM));
+				}
+				
 			}
 		});
+		
+		//Comportamento de receber mensagem de outros agentes
+		addBehaviour(new CyclicBehaviour() {
+			@Override
+			public void action() {
+				MessageTemplate mtInform = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+				ACLMessage messageInform = myAgent.receive(mtInform);
+				
+				if (messageInform != null) {
+					
+				} else {
+					block();
+				}
+			}
+		});
+	}
+	
+	private Agent getCurrentAgent() {
+		return this;
 	}
 
 	private void createAgentName() {

@@ -1,9 +1,16 @@
 package br.ufg.inf.semaforo.environment;
 
+import java.io.Serializable;
+
 import br.ufg.inf.semaforo.constant.EnumEstadoMovimentoCarro;
 
-public class Car {
+public class Car implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2410226813241953180L;
+	
 	private Double tamanho;
 	private Double velocidadeMedia;
 	private Double distanciaDoSemaforo;
