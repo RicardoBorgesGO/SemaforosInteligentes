@@ -1,12 +1,9 @@
 package br.ufg.inf.semaforo.environment;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javax.swing.text.StyledEditorKit.ItalicAction;
 
 import br.ufg.inf.semaforo.agent.TrafficLightAgent;
 import br.ufg.inf.semaforo.constant.EnumEstadoMovimentoCarro;
@@ -21,7 +18,8 @@ public class Street {
 	private Double tamanhoDaVia;
 	private Double tamanhoReservadoPorCarro;
 	private List<Car> cars;
-	
+	private List<Car> carsExit;
+
 	/**
 	 * Quantidade minima de carros
 	 */
@@ -106,59 +104,97 @@ public class Street {
 	public void setTamanhoReservadoPorCarro(Double tamanhoBlocoDoCarro) {
 		this.tamanhoReservadoPorCarro = tamanhoBlocoDoCarro;
 	}
-	
+
+	public List<Car> getCarsExit() {
+		if (carsExit == null)
+			carsExit = new ArrayList<>();
+		return carsExit;
+	}
+
+	public void setCarsExit(List<Car> carsExit) {
+		this.carsExit = carsExit;
+	}
+
 	public void start() {
 		new Timer().schedule(new TimerTask() {
-			
+
 			@Override
 			public void run() {
-				if (TrafficLightAgent.ESTADO_SEMAFORO.equals(EnumEstadoSemaforo.VERDE)) {
+				if (TrafficLightAgent.ESTADO_SEMAFORO
+						.equals(EnumEstadoSemaforo.VERDE)) {
 					try {
 						for (Car car : cars) {
 							if (car.getDistanciaDoSemaforo() < tamanhoReservadoPorCarro) {
+								addCarExit(car);
 								removeCar(car);
 							}
-							
+
 							runCar(car);
 						}
 					} catch (Exception e) {
-						
+
 					}
 				}
 			}
-			
+
 		}, 0, 1000);
 	}
-	
+
 	public void cognizeCar() {
-		int quantidadeDeCarros = UtilRandom.generateRandom(INIT_COUNT_CAR, BOUND_COUNT_CAR);
-		
+		int quantidadeDeCarros = UtilRandom.generateRandom(INIT_COUNT_CAR,
+				BOUND_COUNT_CAR);
+
 		System.out.println("Chegaram mais " + quantidadeDeCarros + " carros\n");
-		
+
 		for (int i = 0; i < quantidadeDeCarros; i++) {
-			addCar(new Car(tamanhoDaVia, 10.0, EnumEstadoMovimentoCarro.EM_MOVIMENTO));
+			addCar(new Car(tamanhoDaVia, 10.0,
+					EnumEstadoMovimentoCarro.EM_MOVIMENTO));
 		}
-	}
-	
-	/**
-	 * Fazer o carro andar
-	 * @param car
-	 */
-	public void runCar(Car car) {
-		car.setDistanciaDoSemaforo(car.getDistanciaDoSemaforo() - car.getVelocidadeMedia());
 	}
 
 	/**
-	 * Adiciona carros na lista de carros de uma rua
+	 * Fazer o carro andar
+	 * 
+	 * @param car
+	 */
+	public void runCar(Car car) {
+		car.setDistanciaDoSemaforo(car.getDistanciaDoSemaforo()
+				- car.getVelocidadeMedia());
+	}
+
+	/**
+	 * Adiciona carro na lista de carros de uma rua
 	 * 
 	 * @param car
 	 */
 	public void addCar(Car car) {
 		getCars().add(car);
 	}
-	
+
+	/**
+	 * Remove carro na lista de carros de uma rua
+	 * 
+	 * @param car
+	 */
 	public void removeCar(Car car) {
 		getCars().remove(car);
 	}
-
+	
+	/**
+	 * Adiciona carro na lista de carros de saida de uma rua
+	 * 
+	 * @param car
+	 */
+	public void addCarExit(Car car) {
+		getCarsExit().add(car);
+	}
+	
+	/**
+	 * Remove carro na lista de carros de saida de uma rua
+	 * 
+	 * @param car
+	 */
+	public void removeCarExit(Car car) {
+		getCarsExit().remove(car);
+	}
 }

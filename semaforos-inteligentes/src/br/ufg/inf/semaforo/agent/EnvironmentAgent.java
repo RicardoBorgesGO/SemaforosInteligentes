@@ -13,6 +13,7 @@ import br.ufg.inf.semaforo.environment.Car;
 import br.ufg.inf.semaforo.environment.Street;
 import br.ufg.inf.semaforo.util.UtilRandom;
 
+@Deprecated
 public class EnvironmentAgent extends Agent {
 
 	/**
@@ -35,7 +36,7 @@ public class EnvironmentAgent extends Agent {
 	@Override
 	@SuppressWarnings("serial")
 	protected void setup() {
-		System.out.println("Olá! Eu sou um agente Ambiente, meu id é: " + getAID().getName());
+		System.out.println("Olï¿½! Eu sou um agente Ambiente, meu id ï¿½: " + getAID().getName());
 		
 		//TODO Tentar fazer tudo sincrono 
 		
@@ -61,7 +62,7 @@ public class EnvironmentAgent extends Agent {
 				//TODO Continuar
 				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 				msg.addReceiver(new AID("Peter", AID.ISLOCALNAME));
-				msg.setContent("Today it’s raining");
+				msg.setContent("Today itï¿½s raining");
 				send(msg); 
 			}
 		});

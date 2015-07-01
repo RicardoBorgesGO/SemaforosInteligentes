@@ -1,5 +1,6 @@
 package br.ufg.inf.semaforo.agent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
@@ -35,18 +36,22 @@ public class TrafficLightAgent extends Agent {
 	
 	private static Integer COUNT_SEMAFOROS = 0;
 	
+	private Integer numberTrafficLight = 0;
+	
 	/**
 	 * Tempo que o semaforo ficara aberto em segundos
 	 */
 	private static Integer OPEN_TIME = 5;
 	
-//	private Integer quantidadeDeCarrosParaLiberar = 0;
+	private AID[] sellerAgents;
 	
 	@Override
 	@SuppressWarnings("serial")
 	protected void setup() {
 		System.out.println("Agente criado!");
 		System.out.println("Olá! Eu sou um agente Semáforo, meu id: "+ getAID().getName());
+		
+		createAgentName();
 		
 		createSensor();
 		registerInYellowPages();
@@ -84,6 +89,47 @@ public class TrafficLightAgent extends Agent {
 				System.out.println("Percentagem de carros parados: " + UtilMath.calcAfterPercent(countStopCar(cars), countCarInVia, 30.0));
 			}
 		});
+		
+		//Comportamento de procurar todos os agentes no ambiente
+		addBehaviour(new TickerBehaviour(this, 3000) {
+			
+			@Override
+			protected void onTick() {
+				sellerAgents = UtilAgent.searchInYellowPages(TYPE_AGENT, myAgent);
+			}
+		});
+		
+		//Comportamento de enviar os carros que sairam do agente semaforo atual
+		addBehaviour(new TickerBehaviour(this, 1000) {
+			
+			@Override
+			protected void onTick() {
+				for (AID aid : sellerAgents) {
+					if (aid.getName().equals(searchNameNextAgent())) {
+						//TODO Enviar mensagem para o agente que encontrou
+					}
+				}
+				
+				sensor.getStreet().getCarsExit();
+			}
+		});
+	}
+
+	private void createAgentName() {
+		numberTrafficLight = COUNT_SEMAFOROS;
+		AGENT_NAME = AGENT_NAME + "-" + COUNT_SEMAFOROS++;
+	}
+	
+	private String searchNameNextAgent() {
+		Integer num = numberTrafficLight;
+		numberTrafficLight++;
+		
+		return AGENT_NAME.concat(num.toString());
+	}
+	
+	public static void main(String[] args) {
+		TrafficLightAgent agent = new TrafficLightAgent();
+		agent.searchNameNextAgent();
 	}
 	
 	private Double countStopCar(List<Car> cars) {
@@ -97,23 +143,10 @@ public class TrafficLightAgent extends Agent {
 		return count;
 	}
 	
-//	private Set<Car> countToReleaseCars(Map<Car, Double> cars) {
-//		Set<Car> carrosParaLiberar = new LinkedHashSet<Car>();
-//		
-//		for (Car car : cars.keySet()) {
-//			Double time = cars.get(car);
-//			
-//			if (time < 2)
-//				carrosParaLiberar.add(car);
-//		}
-//		
-//		return carrosParaLiberar;
-//	}
-	
 	private void liberarSemaforo() {
 		ESTADO_SEMAFORO = EnumEstadoSemaforo.VERDE;
 		
-		Timer timer = new Timer();
+		final Timer timer = new Timer();
 		
 		TimerTask timerTask = new TimerTask() {
 			int segundosAberto = 0;
@@ -169,6 +202,6 @@ public class TrafficLightAgent extends Agent {
 	 * Registra os agentas nas paginas amarelas (DFAgent)
 	 */
 	private void registerInYellowPages() {
-		UtilAgent.registerInYellowPages(getAID(), this, TYPE_AGENT, AGENT_NAME + "-" + COUNT_SEMAFOROS++);
+		UtilAgent.registerInYellowPages(getAID(), this, TYPE_AGENT, AGENT_NAME);
 	}
 }

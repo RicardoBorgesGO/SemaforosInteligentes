@@ -41,8 +41,6 @@ public class Sensor implements Serializable {
 				for (Car car : getStreet().getCars()) {
 					if (car.getDistanciaDoSemaforo() >= 10 && verificaQuantidadeDeCarrosPorVia(car))
 						street.runCar(car);
-//					else
-//						car.setEstadoMovimentoCarro(EnumEstadoMovimentoCarro.PARADO);
 					
 					System.out.println("Distancia do semaforo: " + car.getDistanciaDoSemaforo());
 				}
@@ -89,17 +87,6 @@ public class Sensor implements Serializable {
 		}
 		return false;
 	}
-
-	//TODO Passar para a classe Street
-//	public void cognizeCar() {
-//		int quantidadeDeCarros = UtilRandom.generateRandom(INIT_COUNT_CAR, BOUND_COUNT_CAR);
-//		
-//		System.out.println("Chegaram mais " + quantidadeDeCarros + " carros\n");
-//		
-//		for (int i = 0; i < quantidadeDeCarros; i++) {
-//			getStreet().addCar(new Car(distanciaSensoriamento, 10.0, EnumEstadoMovimentoCarro.EM_MOVIMENTO));
-//		}
-//	}
 
 	public Street getStreet() {
 		return street;

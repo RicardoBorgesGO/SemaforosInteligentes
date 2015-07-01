@@ -24,4 +24,26 @@ public class UtilAgent {
 			fe.printStackTrace();
 		}
 	}
+	
+	public static AID[] searchInYellowPages(String agentType, Agent myAgent) {
+		AID[] sellerAgents = null;
+		
+		DFAgentDescription template = new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(agentType);
+		template.addServices(sd);
+		
+		try {
+			DFAgentDescription[] result = DFService.search(myAgent, template);
+			sellerAgents = new AID[result.length];
+			
+			for (int i = 0; i < result.length; ++i) {
+				sellerAgents[i] = result[i].getName();
+			}
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+		
+		return sellerAgents;
+	}
 }

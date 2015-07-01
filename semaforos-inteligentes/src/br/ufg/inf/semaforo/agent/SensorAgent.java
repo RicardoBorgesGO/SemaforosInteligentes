@@ -12,6 +12,7 @@ import java.util.List;
 import br.ufg.inf.semaforo.util.UtilAgent;
 import br.ufg.inf.semaforo.vo.SemaforoVO;
 
+@Deprecated
 public class SensorAgent extends Agent {
 
 	/**

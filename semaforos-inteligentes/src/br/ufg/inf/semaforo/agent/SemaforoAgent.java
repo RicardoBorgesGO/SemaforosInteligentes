@@ -15,6 +15,7 @@ import br.ufg.inf.semaforo.util.UtilAgent;
 import br.ufg.inf.semaforo.util.UtilMessage;
 import br.ufg.inf.semaforo.util.UtilRandom;
 
+@Deprecated
 public class SemaforoAgent extends Agent {
 
 	/**
