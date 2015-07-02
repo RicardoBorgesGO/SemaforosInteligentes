@@ -78,15 +78,17 @@ public class Sensor implements Serializable {
 		int quantidadeDeCarrosNaMesmaDistancia = 0;
 		Double distanciaDeParada = 0.0;
 		
-		for (Car car : getStreet().getCars()) {
-			if (car.getDistanciaDoSemaforo().equals(distanciaDeParada)) {
-				car.setEstadoMovimentoCarro(EnumEstadoMovimentoCarro.PARADO);
-				quantidadeDeCarrosNaMesmaDistancia++;
-			}
-			
-			if (quantidadeDeCarrosNaMesmaDistancia == getStreet().getQuantidadeDeVias()) {
-				quantidadeDeCarrosNaMesmaDistancia = 0;
-				distanciaDeParada += car.getVelocidadeMedia();
+		synchronized (getStreet().getCars()) {
+			for (Car car : getStreet().getCars()) {
+				if (car.getDistanciaDoSemaforo().equals(distanciaDeParada)) {
+					car.setEstadoMovimentoCarro(EnumEstadoMovimentoCarro.PARADO);
+					quantidadeDeCarrosNaMesmaDistancia++;
+				}
+				
+				if (quantidadeDeCarrosNaMesmaDistancia == getStreet().getQuantidadeDeVias()) {
+					quantidadeDeCarrosNaMesmaDistancia = 0;
+					distanciaDeParada += car.getVelocidadeMedia();
+				}
 			}
 		}
 		return false;
