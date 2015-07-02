@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import br.ufg.inf.semaforo.constant.EnumEstadoMovimentoCarro;
 import br.ufg.inf.semaforo.constant.EnumEstadoSemaforo;
 import br.ufg.inf.semaforo.constant.EnumTrackDirection;
 import br.ufg.inf.semaforo.environment.Car;
@@ -71,7 +70,9 @@ public class TrafficLightAgent extends Agent {
 
 			@Override
 			protected void onTick() {
-				sensor.start();
+				boolean fistTraffic = numberTrafficLight == 0 ? true : false; 
+				
+				sensor.start(fistTraffic);
 			}
 		});
 

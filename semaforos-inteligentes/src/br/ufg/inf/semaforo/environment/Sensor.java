@@ -27,8 +27,9 @@ public class Sensor implements Serializable {
 		this.distanciaSensoriamento = distanciaSensoriamento;
 	}
 	
-	public void start() {
-		street.cognizeCar();
+	public void start(boolean firstTraffic) {
+		if (firstTraffic)
+			street.cognizeCar();
 
 		/**
 		 * Temporizador em segundos
@@ -43,7 +44,7 @@ public class Sensor implements Serializable {
 							if (car.getDistanciaDoSemaforo() >= 10 && verificaQuantidadeDeCarrosPorVia(car))
 								street.runCar(car);
 							
-							System.out.println("Distancia do semaforo: " + car.getDistanciaDoSemaforo());
+//							System.out.println("Distancia do semaforo: " + car.getDistanciaDoSemaforo());
 						}
 					}
 					
