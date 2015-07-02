@@ -2,6 +2,7 @@ package br.ufg.inf.semaforo.vo;
 
 import jade.core.AID;
 
+@Deprecated
 public class SemaforoVO {
 
 	private AID aid;

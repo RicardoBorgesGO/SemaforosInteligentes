@@ -8,6 +8,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
+@Deprecated
 public class SearchAgentBehaviour extends TickerBehaviour {
 
 	/**
