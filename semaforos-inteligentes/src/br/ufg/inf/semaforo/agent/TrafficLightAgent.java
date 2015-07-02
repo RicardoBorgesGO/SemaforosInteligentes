@@ -120,11 +120,6 @@ public class TrafficLightAgent extends Agent {
 						System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ENVIOU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 						UtilMessage.sendObjectMessage(car, aid, getCurrentAgent(), new ACLMessage(ACLMessage.INFORM));
 					}
-//					for (Car car : sensor.getStreet().getCarsExit()) {
-//						System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ENVIOU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//						UtilMessage.sendObjectMessage(car, aid, getCurrentAgent(), new ACLMessage(ACLMessage.INFORM));
-//						sensor.getStreet().removeCarExit(car);
-//					}
 				}
 			}
 		});
