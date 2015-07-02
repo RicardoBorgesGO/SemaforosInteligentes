@@ -37,16 +37,20 @@ public class Sensor implements Serializable {
 			
 			@Override
 			public void run() {
-				
-				for (Car car : getStreet().getCars()) {
-					if (car.getDistanciaDoSemaforo() >= 10 && verificaQuantidadeDeCarrosPorVia(car))
-						street.runCar(car);
+//				try {
+					synchronized(getStreet().getCars()) {
+						for (Car car : getStreet().getCars()) {
+							if (car.getDistanciaDoSemaforo() >= 10 && verificaQuantidadeDeCarrosPorVia(car))
+								street.runCar(car);
+							
+							System.out.println("Distancia do semaforo: " + car.getDistanciaDoSemaforo());
+						}
+					}
 					
-					System.out.println("Distancia do semaforo: " + car.getDistanciaDoSemaforo());
-				}
-				
-				verificaCarrosParados();
-				
+					verificaCarrosParados();
+//				} catch(Exception e) {
+//					
+//				}
 				System.out.println("=========================\n");
 				System.out.println("Quantidade de carros: " + getStreet().getCars().size());
 			}

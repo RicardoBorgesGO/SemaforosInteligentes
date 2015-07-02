@@ -123,13 +123,15 @@ public class Street {
 				if (TrafficLightAgent.ESTADO_SEMAFORO
 						.equals(EnumEstadoSemaforo.VERDE)) {
 					try {
-						for (Car car : cars) {
-							if (car.getDistanciaDoSemaforo() < tamanhoReservadoPorCarro) {
-								addCarExit(car);
-								removeCar(car);
+						synchronized(cars) {
+							for (Car car : cars) {
+								if (car.getDistanciaDoSemaforo() < tamanhoReservadoPorCarro) {
+									addCarExit(car);
+									removeCar(car);
+								}
+	
+								runCar(car);
 							}
-
-							runCar(car);
 						}
 					} catch (Exception e) {
 
@@ -141,15 +143,37 @@ public class Street {
 	}
 
 	public void cognizeCar() {
-		int quantidadeDeCarros = UtilRandom.generateRandom(INIT_COUNT_CAR,
-				BOUND_COUNT_CAR);
-
-		System.out.println("Chegaram mais " + quantidadeDeCarros + " carros\n");
-
-		for (int i = 0; i < quantidadeDeCarros; i++) {
-			addCar(new Car(tamanhoDaVia, 10.0,
-					EnumEstadoMovimentoCarro.EM_MOVIMENTO));
+		if (cars.size() <= 50) {
+			int quantidadeDeCarros = UtilRandom.generateRandom(INIT_COUNT_CAR, BOUND_COUNT_CAR);
+	
+			System.out.println("Chegaram mais " + quantidadeDeCarros + " carros\n");
+			
+//			try {
+			synchronized (cars) {
+				for (int i = 0; i < quantidadeDeCarros; i++) {
+					addCar(new Car(tamanhoDaVia, 10.0, EnumEstadoMovimentoCarro.EM_MOVIMENTO));
+				}
+			}
+//			} catch(Exception e) {
+//				
+//			}
 		}
+	}
+	
+	public Car cognizeNextCar() {
+		Car car = null;
+		
+//		try {
+		synchronized (cars) {
+			if (getCarsExit() != null && !getCarsExit().isEmpty()) {
+				car = getCarsExit().get(0);
+				getCarsExit().remove(0);
+			}
+		}
+//		} catch(Exception e) {
+			
+//		}
+		return car;
 	}
 
 	/**
@@ -168,6 +192,16 @@ public class Street {
 	 * @param car
 	 */
 	public void addCar(Car car) {
+		getCars().add(car);
+	}
+	
+	/**
+	 * Adiciona carro na lista de carros de uma rua
+	 * 
+	 * @param car
+	 */
+	public void addWarnNewCar(Car car) {
+		car.setDistanciaDoSemaforo(tamanhoDaVia*2);
 		getCars().add(car);
 	}
 

@@ -94,7 +94,7 @@ public class TrafficLightAgent extends Agent {
 				}
 				
 				System.out.println("Estado semaforo: " + ESTADO_SEMAFORO);
-				System.out.println("Percentagem de carros parados: " + UtilMath.calcAfterPercent(countStopCar(cars), countCarInVia, 30.0));
+				System.out.println("Percentagem de carros parados: " + UtilMath.calcAfterPercent(countStopCar(cars), countCarInVia, 10.0));
 			}
 		});
 		
@@ -103,7 +103,7 @@ public class TrafficLightAgent extends Agent {
 			
 			@Override
 			protected void onTick() {
-				sellerAgents = UtilAgent.searchInYellowPages(TYPE_AGENT, myAgent);
+				sellerAgents = UtilAgent.searchInYellowPagesWithName(searchNameNextAgent(), myAgent);
 			}
 		});
 		
@@ -112,24 +112,19 @@ public class TrafficLightAgent extends Agent {
 			
 			@Override
 			protected void onTick() {
-				AID aid = null;
-				
-				System.out.println("Proximo agente: " + searchNameNextAgent());
-				
-				if (sellerAgents != null) {
-					for (AID aidThis : sellerAgents) {
-						if (aidThis.getName().equals(searchNameNextAgent())) {
-							aid = aidThis;
-							break;
-						}
-					}
+				if (sellerAgents != null && sellerAgents.length > 0) {
+					AID aid = sellerAgents[0];
+					Car car = sensor.getStreet().cognizeNextCar();
 					
-					if (aid != null) {
-						for (Car car : sensor.getStreet().getCarsExit()) {
-							System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ENVIOU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-							UtilMessage.sendObjectMessage(car, aid, getCurrentAgent(), new ACLMessage(ACLMessage.INFORM));
-						}
+					if (car != null) {
+						System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ENVIOU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						UtilMessage.sendObjectMessage(car, aid, getCurrentAgent(), new ACLMessage(ACLMessage.INFORM));
 					}
+//					for (Car car : sensor.getStreet().getCarsExit()) {
+//						System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ENVIOU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//						UtilMessage.sendObjectMessage(car, aid, getCurrentAgent(), new ACLMessage(ACLMessage.INFORM));
+//						sensor.getStreet().removeCarExit(car);
+//					}
 				}
 			}
 		});
@@ -144,7 +139,7 @@ public class TrafficLightAgent extends Agent {
 				if (messageInform != null) {
 					try {
 						Car car = (Car) messageInform.getContentObject();
-						sensor.getStreet().addCar(car);
+						sensor.getStreet().addWarnNewCar(car);
 						System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!RECEBEU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 					} catch (UnreadableException e) {
 						e.printStackTrace();
@@ -182,6 +177,8 @@ public class TrafficLightAgent extends Agent {
 		Double count = 0.0;
 		
 		for (Car car : cars) {
+			//TODO Modificar medida para calcular a quantidade de carros que passaram do sensor, ou seja, menor
+			//que 100m
 			if (car.getEstadoMovimentoCarro().equals(EnumEstadoMovimentoCarro.PARADO))
 				count++;
 		}
